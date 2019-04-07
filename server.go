@@ -23,6 +23,7 @@ func main() {
 
     // create router for api endpoints
     router := BaseRouter()
+    DeviceRouter(router)
 
     // start webserver loop
     log.Fatal(http.ListenAndServe(":8000", router))
