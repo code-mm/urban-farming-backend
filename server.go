@@ -10,9 +10,15 @@ import (
 // database handle
 var Db *pg.DB
 
+// jwt secret
+var JwtSecret string
+
 func main() {
     // read database related environment variables
     connectionOptions := GetDbConnectionOptions(os.Getenv("DbHostname"), os.Getenv("DbPort"), os.Getenv("DbUsername"), os.Getenv("DbPassword"), os.Getenv("DbDatabase"))
+
+    // read jwt secret related environment variable
+    JwtSecret = os.Getenv("JwtSecret")
 
     // open database
     Db = OpenDb(connectionOptions)
