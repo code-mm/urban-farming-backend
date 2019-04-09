@@ -23,6 +23,7 @@ func main() {
 
     // create router for api endpoints
     router := BaseRouter()
+    AuthenticationRouter(router)
     DeviceRouter(router)
 
     // start webserver loop
