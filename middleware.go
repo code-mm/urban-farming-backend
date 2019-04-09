@@ -16,7 +16,7 @@ func JwtTokenValidationDevice(rw http.ResponseWriter, r *http.Request, next http
         return
 	}
 
-	if err = token.Validate([]byte("your-256-bit-secret"), crypto.SigningMethodHS256); err != nil {
+	if err = token.Validate([]byte(JwtSecret), crypto.SigningMethodHS256); err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
         return
 	}

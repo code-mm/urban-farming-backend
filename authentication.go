@@ -37,7 +37,7 @@ func AuthenticationGetTokenDevice(w http.ResponseWriter, r *http.Request) {
     claims.SetSubject(deviceIdentifier)
     claims.SetIssuedAt(time.Now())
     claims.SetExpiration(time.Now().Add(time.Duration(3600) * time.Second))
-    token, _ := jws.NewJWT(claims, crypto.SigningMethodHS256).Serialize([]byte("your-256-bit-secret"))
+    token, _ := jws.NewJWT(claims, crypto.SigningMethodHS256).Serialize([]byte(JwtSecret))
 
     // return the web token
     w.Header().Set("Content-Type", "application/jwt")
