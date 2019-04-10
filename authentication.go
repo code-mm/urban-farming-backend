@@ -4,6 +4,7 @@ import (
     "net/http"
     "time"
     "io"
+    "golang.org/x/crypto/bcrypt"
     "github.com/SermoDigital/jose/jws"
     "github.com/SermoDigital/jose/crypto"
 )
@@ -20,14 +21,16 @@ func AuthenticationGetTokenDevice(w http.ResponseWriter, r *http.Request) {
     deviceSecret := r.FormValue("deviceSecret")
 
     // check if identifier and secret are valid
+//    device, err := Db.Model(new(ModelDevice)).Where("Identifier = ?", deviceIdentifier).Exists()
     device := new(ModelDevice)
-    exists, err := Db.Model(device).Where("Identifier = ?", deviceIdentifier).Where("Secret = ?", deviceSecret).Exists()
+    _, err := Db.QueryOne(device, `SELECT * FROM device WHERE identifier = ?`, deviceIdentifier)
 
     if err != nil {
         panic(err)
     }
 
-    if !exists {
+    // compare hashed secret with plaintext secret and deny access if not equal
+    if bcrypt.CompareHashAndPassword([]byte(device.Secret), []byte(deviceSecret)) != nil {
         w.WriteHeader(http.StatusUnauthorized)
         return
     }
