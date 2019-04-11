@@ -42,29 +42,29 @@ type ModelDevice struct {
 
 type ModelDeviceDataPointPh struct {
     tableName           struct{}        `sql:"device_datapoint_ph"`
-    Id                  int64           `sql:",pk"`
+    Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull"`
     Value               float32         `sql:",notnull"`
-    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE`
-    ModelDevice         *ModelDevice
+    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDevice         *ModelDevice    `json:"-"`
 }
 
 type ModelDeviceDataPointOxygen struct {
     tableName           struct{}        `sql:"device_datapoint_oxygen"`
-    Id                  int64           `sql:",pk"`
+    Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull"`
     Value               float32         `sql:",notnull"`
-    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE`
-    ModelDevice         *ModelDevice
+    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDevice         *ModelDevice    `json:"-"`
 }
 
 type ModelDeviceDataPointTemperature struct {
     tableName           struct{}        `sql:"device_datapoint_temperature"`
-    Id                  int64           `sql:",pk"`
+    Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull"`
     Value               float32         `sql:",notnull"`
-    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE`
-    ModelDevice         *ModelDevice
+    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDevice         *ModelDevice    `json:"-"`
 }
 
 type ModelDeviceSetting struct {
@@ -73,5 +73,5 @@ type ModelDeviceSetting struct {
     Key                 string          `sql:",notnull"`
     Value               string          `sql:",notnull"`
     ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE`
-    ModelDevice         *ModelDevice
+    ModelDevice         *ModelDevice    `json:"-"`
 }
