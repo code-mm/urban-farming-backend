@@ -32,12 +32,12 @@ type ModelWorkspace struct {
  */
 type ModelDevice struct {
     tableName           struct{}        `sql:"device"`
-    Id                  int64           `sql:",pk"`
-    Name                string
+    Id                  int64           `sql:",pk" json:"-"`
+    Name                string          
     Identifier          uuid.UUID       `sql:",type:uuid,unique,notnull"`
-    Secret              string          `sql:",notnull"`
+    Secret              string          `sql:",notnull" json:"-"`
     ModelWorkspaceId    int             `sql:"on_delete:RESTRICT, on_update:CASCADE`
-    ModelWorkspace      *ModelWorkspace
+    ModelWorkspace      *ModelWorkspace `json:"-"`
 }
 
 type ModelDeviceDataPointPh struct {
