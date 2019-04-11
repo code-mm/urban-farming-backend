@@ -21,11 +21,6 @@ func Device(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-func DeviceDataPoint(w http.ResponseWriter, r *http.Request) {
-
-    fmt.Fprintf(w, "DeviceDataPoint")
-}
-
 func DeviceDataPointPh(w http.ResponseWriter, r *http.Request) {
     fmt.Fprintf(w, "DeviceDataPointPh")
 }
