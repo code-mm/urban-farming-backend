@@ -45,7 +45,7 @@ type ModelDeviceDataPointPh struct {
     Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull"`
     Value               float32         `sql:",notnull"`
-    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
     ModelDevice         *ModelDevice    `json:"-"`
 }
 
@@ -54,7 +54,7 @@ type ModelDeviceDataPointOxygen struct {
     Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull"`
     Value               float32         `sql:",notnull"`
-    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
     ModelDevice         *ModelDevice    `json:"-"`
 }
 
@@ -63,7 +63,7 @@ type ModelDeviceDataPointTemperature struct {
     Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull"`
     Value               float32         `sql:",notnull"`
-    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
     ModelDevice         *ModelDevice    `json:"-"`
 }
 
@@ -72,6 +72,6 @@ type ModelDeviceSetting struct {
     Id                  int64           `sql:",pk"`
     Key                 string          `sql:",notnull"`
     Value               string          `sql:",notnull"`
-    ModelDeviceId       int             `sql:"on_delete:RESTRICT, on_update:CASCADE`
+    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE`
     ModelDevice         *ModelDevice    `json:"-"`
 }
