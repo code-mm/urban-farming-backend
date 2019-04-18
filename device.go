@@ -1,7 +1,6 @@
 package main
 
 import (
-    "log"
     "net/http"
     "encoding/json"
     "github.com/gorilla/context"
@@ -13,12 +12,16 @@ import (
  * device
  */
 func Device(w http.ResponseWriter, r *http.Request) {
-    device := new(ModelDevice)
-    _, err := Db.QueryOne(device, `SELECT * FROM device WHERE identifier = ?`, context.Get(r, "deviceIdentifier").(string))
+    var device ModelDevice
+    if _, err := Db.QueryOne(&device, `SELECT * FROM device WHERE identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
 
     result, err := json.Marshal(device)
     if err != nil {
-        log.Panic(err)
+        w.WriteHeader(http.StatusInternalServerError)
+        return
     }
     
     w.Header().Set("Content-Type", "application/json")
@@ -30,12 +33,19 @@ func Device(w http.ResponseWriter, r *http.Request) {
  *  device datapoint ph
  */
 func DeviceDataPointPhList(w http.ResponseWriter, r *http.Request) {
-    deviceDataPointPh := new([]ModelDeviceDataPointPh)
-    _, err := Db.QueryOne(deviceDataPointPh, `SELECT device_datapoint_ph.time, device_datapoint_ph.value FROM device_datapoint_ph INNER JOIN device ON device_datapoint_ph.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string))
+    var dataPoint []ModelDeviceDataPointPh
 
-    result, err := json.Marshal(deviceDataPointPh)
+    // query database for data points
+    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_ph.time, device_datapoint_ph.value FROM device_datapoint_ph INNER JOIN device ON device_datapoint_ph.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+
+    // marshal data to json
+    result, err := json.Marshal(dataPoint)
     if err != nil {
-        log.Panic(err)
+        w.WriteHeader(http.StatusInternalServerError)
+        return
     }
 
     w.Header().Set("Content-Type", "application/json")
@@ -79,12 +89,19 @@ func DeviceDataPointPhCreate(w http.ResponseWriter, r *http.Request) {
  * device datapoint oxygen
  */
 func DeviceDataPointOxygenList(w http.ResponseWriter, r *http.Request) {
-    deviceDataPointOxygen := new([]ModelDeviceDataPointOxygen)
-    _, err := Db.QueryOne(deviceDataPointOxygen, `SELECT device_datapoint_oxygen.time, device_datapoint_oxygen.value FROM device_datapoint_oxygen INNER JOIN device ON device_datapoint_oxygen.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string))
+    var dataPoint []ModelDeviceDataPointOxygen
 
-    result, err := json.Marshal(deviceDataPointOxygen)
+    // query database for data points
+    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_oxygen.time, device_datapoint_oxygen.value FROM device_datapoint_oxygen INNER JOIN device ON device_datapoint_oxygen.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+
+    // marshal data to json
+    result, err := json.Marshal(dataPoint)
     if err != nil {
-        log.Panic(err)
+        w.WriteHeader(http.StatusInternalServerError)
+        return
     }
 
     w.Header().Set("Content-Type", "application/json")
@@ -128,12 +145,19 @@ func DeviceDataPointOxygenCreate(w http.ResponseWriter, r *http.Request) {
  * device datapoint temperature
  */
 func DeviceDataPointTemperatureList(w http.ResponseWriter, r *http.Request) {
-    deviceDataPointTemperature := new([]ModelDeviceDataPointTemperature)
-    _, err := Db.QueryOne(deviceDataPointTemperature, `SELECT device_datapoint_temperature.time, device_datapoint_temperature.value FROM device_datapoint_temperature INNER JOIN device ON device_datapoint_temperature.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string))
+    var dataPoint []ModelDeviceDataPointTemperature
 
-    result, err := json.Marshal(deviceDataPointTemperature)
+    // query database for data points
+    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_temperature.time, device_datapoint_temperature.value FROM device_datapoint_temperature INNER JOIN device ON device_datapoint_temperature.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+
+    // marshal data to json
+    result, err := json.Marshal(dataPoint)
     if err != nil {
-        log.Panic(err)
+        w.WriteHeader(http.StatusInternalServerError)
+        return
     }
 
     w.Header().Set("Content-Type", "application/json")
