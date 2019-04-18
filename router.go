@@ -18,7 +18,8 @@ func AuthenticationRouter(router *mux.Router) {
 func DeviceRouter(router *mux.Router) {
 	deviceSubrouter := router.PathPrefix("/device").Subrouter()
     deviceSubrouter.Handle("/", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(Device))).Methods("GET")
-    deviceSubrouter.Handle("/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointPh))).Methods("GET", "POST")
+    deviceSubrouter.Handle("/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointPhList))).Methods("GET")
+    deviceSubrouter.Handle("/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointPhCreate))).Methods("POST")
     deviceSubrouter.Handle("/datapoint/oxygen", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointOxygen))).Methods("GET", "POST")
     deviceSubrouter.Handle("/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointTemperature))).Methods("GET", "POST")
 }
