@@ -78,7 +78,7 @@ func DeviceDataPointPhCreate(w http.ResponseWriter, r *http.Request) {
 /*
  * device datapoint oxygen
  */
-func DeviceDataPointOxygen(w http.ResponseWriter, r *http.Request) {
+func DeviceDataPointOxygenList(w http.ResponseWriter, r *http.Request) {
     deviceDataPointOxygen := new([]ModelDeviceDataPointOxygen)
     _, err := Db.QueryOne(deviceDataPointOxygen, `SELECT device_datapoint_oxygen.time, device_datapoint_oxygen.value FROM device_datapoint_oxygen INNER JOIN device ON device_datapoint_oxygen.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string))
 
@@ -89,6 +89,38 @@ func DeviceDataPointOxygen(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     w.Write(result)
+}
+
+func DeviceDataPointOxygenCreate(w http.ResponseWriter, r *http.Request) {
+    var dataPoint ModelDeviceDataPointOxygen
+
+    // decode json from request
+    if err := json.NewDecoder(r.Body).Decode(&dataPoint); err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+    defer r.Body.Close()
+
+    // validate submitted data
+    if err := validator.Validate(dataPoint); err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        return
+    }
+
+    // add device id to the model
+    if _, err := Db.QueryOne(&(dataPoint.ModelDeviceId), `SELECT device.id FROM device WHERE identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+
+    // write model to database
+    if err := Db.Insert(&dataPoint); err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        return
+    }
+
+    // return http status created
+    w.WriteHeader(http.StatusCreated)
 }
 
 
