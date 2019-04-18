@@ -43,8 +43,8 @@ type ModelDevice struct {
 type ModelDeviceDataPointPh struct {
     tableName           struct{}        `sql:"device_datapoint_ph"`
     Id                  int64           `sql:",pk" json:"-"`
-    Time                time.Time       `sql:",notnull"`
-    Value               float32         `sql:",notnull"`
+    Time                time.Time       `sql:",notnull" validate:"regexp=^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})\+(\d{2})\:(\d{2})$"`
+    Value               float32         `sql:",notnull" validate:"min=0,max=10"`
     ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
     ModelDevice         *ModelDevice    `json:"-"`
 }
