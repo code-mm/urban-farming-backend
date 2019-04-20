@@ -8,23 +8,24 @@ import (
 /*
  * user
  */
-type ModelUser struct {
-    tableName           struct{}        `sql:"user"`
-    Id                  int             `sql:",pk"`
+type ModelUserAccount struct {
+    tableName           struct{}        `sql:"user_account"`
+    Id                  int             `sql:",pk" json:"-"`
     Firstname           string          `sql:",notnull"`
     Lastname            string          `sql:",notnull"`
     Email               string          `sql:",notnull"`
+    Password            string          `sql:",notnull" json:"-"`
 }
 
 /*
  * workspace
  */
 type ModelWorkspace struct {
-    tableName           struct{}        `sql:"workspace"`
-    Id                  int             `sql:",pk"`
-    Name                string          `sql:",notnull"`
-    ModelUserId         int             `sql:"on_delete:RESTRICT, on_update:CASCADE"`
-    ModelUser           *ModelUser
+    tableName           struct{}            `sql:"workspace"`
+    Id                  int                 `sql:",pk"`
+    Name                string              `sql:",notnull"`
+    ModelUserAccountId  int                 `sql:"on_delete:RESTRICT, on_update:CASCADE"`
+    ModelUserAccount    *ModelUserAccount
 }
 
 /*

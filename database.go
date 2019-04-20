@@ -36,7 +36,7 @@ func CloseDb(Db *pg.DB) {
 
 func InitDb(Db *pg.DB) error {
     models := []interface{} {
-        (*ModelUser)(nil),
+        (*ModelUserAccount)(nil),
         (*ModelWorkspace)(nil),
         (*ModelDevice)(nil),
         (*ModelDeviceSetting)(nil),
