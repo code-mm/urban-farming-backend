@@ -44,3 +44,39 @@ func AuthenticationGetTokenDevice(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/jwt")
     io.WriteString(w, string(token[:]))
 }
+
+func AuthenticationGetTokenUser(w http.ResponseWriter, r *http.Request) {
+    // check if we got application/x-www-form-urlencoded content type
+    if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
+        w.WriteHeader(http.StatusUnsupportedMediaType)
+        return
+    }
+
+    // extract email and password
+    email := r.FormValue("email")
+    password := r.FormValue("password")
+
+    // check if email and password are valid
+    var user ModelUserAccount
+    if _, err := Db.QueryOne(&user, `SELECT * FROM user_account WHERE email = ?`, email); err != nil {
+        w.WriteHeader(http.StatusUnauthorized)
+        return
+    }
+
+    // compare hashed password with plaintext password and deny access if not equal
+    if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
+        w.WriteHeader(http.StatusUnauthorized)
+        return
+    }
+
+    // generate json web token
+    claims := jws.Claims{}
+    claims.SetSubject(email)
+    claims.SetIssuedAt(time.Now())
+    claims.SetExpiration(time.Now().Add(time.Duration(3600) * time.Second))
+    token, _ := jws.NewJWT(claims, crypto.SigningMethodHS256).Serialize([]byte(JwtSecret))
+
+    // return the web token
+    w.Header().Set("Content-Type", "application/jwt")
+    io.WriteString(w, string(token[:]))
+}
