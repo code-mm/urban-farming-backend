@@ -13,6 +13,7 @@ func BaseRouter() *mux.Router {
 func AuthenticationRouter(router *mux.Router) {
     authenticationSubrouter := router.PathPrefix("/authentication").Subrouter()
     authenticationSubrouter.HandleFunc("/gettoken/device", AuthenticationGetTokenDevice).Methods("POST")
+    authenticationSubrouter.HandleFunc("/gettoken/user", AuthenticationGetTokenUser).Methods("POST")
 }
 
 func DeviceRouter(router *mux.Router) {
