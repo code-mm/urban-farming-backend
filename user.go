@@ -11,8 +11,8 @@ import (
  * device
  */
 func User(w http.ResponseWriter, r *http.Request) {
-    var user ModelUserAccount
-    if _, err := Db.QueryOne(&user, `SELECT * FROM user_account WHERE email = ?`, context.Get(r, "email").(string)); err != nil {
+    var user ModelUser
+    if _, err := Db.QueryOne(&user, `SELECT * FROM "user" WHERE email = ?`, context.Get(r, "email").(string)); err != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }

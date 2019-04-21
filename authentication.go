@@ -57,8 +57,8 @@ func AuthenticationGetTokenUser(w http.ResponseWriter, r *http.Request) {
     password := r.FormValue("password")
 
     // check if email and password are valid
-    var user ModelUserAccount
-    if _, err := Db.QueryOne(&user, `SELECT * FROM user_account WHERE email = ?`, email); err != nil {
+    var user ModelUser
+    if _, err := Db.QueryOne(&user, `SELECT * FROM "user" WHERE email = ?`, email); err != nil {
         w.WriteHeader(http.StatusUnauthorized)
         return
     }

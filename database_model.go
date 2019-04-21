@@ -8,8 +8,8 @@ import (
 /*
  * user
  */
-type ModelUserAccount struct {
-    tableName           struct{}            `sql:"user_account"`
+type ModelUser struct {
+    tableName           struct{}            `sql:"user"`
     Id                  int                 `sql:",pk" json:"-"`
     Firstname           string              `sql:",notnull"`
     Lastname            string              `sql:",notnull"`
@@ -18,14 +18,17 @@ type ModelUserAccount struct {
 }
 
 /*
- * workspace
+ * device access
  */
-type ModelWorkspace struct {
-    tableName           struct{}            `sql:"workspace"`
-    Id                  int                 `sql:",pk"`
-    Name                string              `sql:",notnull"`
-    ModelUserAccountId  int                 `sql:"on_delete:CASCADE, on_update:CASCADE"`
-    ModelUserAccount    *ModelUserAccount
+type ModelUserDeviceAccess struct {
+    tableName           struct{}            `sql:"user_device_access"`
+    Id                  int                 `sql:",pk" json:"-"`
+    Read                bool                `sql:",notnull, default:false"`
+    Write               bool                `sql:",notnull, default:false"`
+    ModelUserId         int                 `sql:"on_delete:CASCADE, on_update:CASCADE`
+    ModelUser           *ModelUser          `json:"-"`
+    ModelDeviceId       int64               `sql:"on_delete:CASCADE, on_update:CASCADE`
+    ModelDevice         *ModelDevice        `json:"-"`
 }
 
 /*
@@ -37,8 +40,7 @@ type ModelDevice struct {
     Name                string          
     Identifier          uuid.UUID           `sql:",type:uuid,unique,notnull"`
     Secret              string              `sql:",notnull" json:"-"`
-    ModelWorkspaceId    int                 `sql:"on_delete:CASCADE, on_update:CASCADE`
-    ModelWorkspace      *ModelWorkspace     `json:"-"`
+    
 }
 
 type ModelDeviceDataPointPh struct {
