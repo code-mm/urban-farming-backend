@@ -31,6 +31,27 @@ func JwtTokenValidationDevice(rw http.ResponseWriter, r *http.Request, next http
     next(rw, r)
 }
 
+func JwtTokenValidationUser(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+	// Parse jwt from request header authorization field
+	token, err := jws.ParseJWTFromRequest(r)
+
+	if err != nil {
+		rw.WriteHeader(http.StatusUnauthorized)
+        return
+	}
+
+	if err = token.Validate([]byte(JwtSecret), crypto.SigningMethodHS256); err != nil {
+		rw.WriteHeader(http.StatusUnauthorized)
+        return
+	}
+
+	// get the email address from json jwt and store it in the request context
+	email := token.Claims()["sub"]
+	context.Set(r, "email", email)
+
+    next(rw, r)
+}
+
 func ContentTypeValidationJson(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	// check content type in request header
 	if r.Header.Get("Content-Type") != "application/json" {
