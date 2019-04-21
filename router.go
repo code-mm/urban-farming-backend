@@ -26,3 +26,8 @@ func DeviceRouter(router *mux.Router) {
     deviceSubrouter.Handle("/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointTemperatureList))).Methods("GET")
     deviceSubrouter.Handle("/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.HandlerFunc(ContentTypeValidationJson), negroni.WrapFunc(DeviceDataPointTemperatureCreate))).Methods("POST")
 }
+
+func UserRouter(router *mux.Router) {
+    userSubrouter := router.PathPrefix("/user").Subrouter()
+    userSubrouter.Handle("/", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(User))).Methods("GET")
+}
