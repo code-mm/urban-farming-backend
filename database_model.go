@@ -24,7 +24,7 @@ type ModelWorkspace struct {
     tableName           struct{}            `sql:"workspace"`
     Id                  int                 `sql:",pk"`
     Name                string              `sql:",notnull"`
-    ModelUserAccountId  int                 `sql:"on_delete:RESTRICT, on_update:CASCADE"`
+    ModelUserAccountId  int                 `sql:"on_delete:CASCADE, on_update:CASCADE"`
     ModelUserAccount    *ModelUserAccount
 }
 
@@ -37,7 +37,7 @@ type ModelDevice struct {
     Name                string          
     Identifier          uuid.UUID       `sql:",type:uuid,unique,notnull"`
     Secret              string          `sql:",notnull" json:"-"`
-    ModelWorkspaceId    int             `sql:"on_delete:RESTRICT, on_update:CASCADE`
+    ModelWorkspaceId    int             `sql:"on_delete:CASCADE, on_update:CASCADE`
     ModelWorkspace      *ModelWorkspace `json:"-"`
 }
 
@@ -46,7 +46,7 @@ type ModelDeviceDataPointPh struct {
     Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull" validate:"regexp=^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})\+(\d{2})\:(\d{2})$"`
     Value               float32         `sql:",notnull" validate:"min=0,max=10"`
-    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDeviceId       int64           `sql:"on_delete:CASCADE, on_update:CASCADE" json:"-"`
     ModelDevice         *ModelDevice    `json:"-"`
 }
 
@@ -55,7 +55,7 @@ type ModelDeviceDataPointOxygen struct {
     Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull" validate:"regexp=^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})\+(\d{2})\:(\d{2})$"`
     Value               float32         `sql:",notnull" validate:"min=0,max=25"`
-    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDeviceId       int64           `sql:"on_delete:CASCADE, on_update:CASCADE" json:"-"`
     ModelDevice         *ModelDevice    `json:"-"`
 }
 
@@ -64,7 +64,7 @@ type ModelDeviceDataPointTemperature struct {
     Id                  int64           `sql:",pk" json:"-"`
     Time                time.Time       `sql:",notnull" validate:"regexp=^(\d{4})-(\d{2})-(\d{2})T(\d{2})\:(\d{2})\:(\d{2})\+(\d{2})\:(\d{2})$"`
     Value               float32         `sql:",notnull" validate:"min=-50,max=150"`
-    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE" json:"-"`
+    ModelDeviceId       int64           `sql:"on_delete:CASCADE, on_update:CASCADE" json:"-"`
     ModelDevice         *ModelDevice    `json:"-"`
 }
 
@@ -73,6 +73,6 @@ type ModelDeviceSetting struct {
     Id                  int64           `sql:",pk"`
     Key                 string          `sql:",notnull"`
     Value               string          `sql:",notnull"`
-    ModelDeviceId       int64           `sql:"on_delete:RESTRICT, on_update:CASCADE`
+    ModelDeviceId       int64           `sql:"on_delete:CASCADE, on_update:CASCADE`
     ModelDevice         *ModelDevice    `json:"-"`
 }
