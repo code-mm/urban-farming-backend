@@ -31,6 +31,7 @@ func main() {
     router := BaseRouter()
     AuthenticationRouter(router)
     DeviceRouter(router)
+    UserRouter(router)
 
     // start webserver loop
     log.Fatal(http.ListenAndServe(":8000", router))
