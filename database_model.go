@@ -36,7 +36,7 @@ type ModelUserDeviceAccess struct {
  */
 type ModelDevice struct {
     tableName           struct{}            `sql:"device"`
-    Id                  int64               `sql:",pk" json:"-"`
+    Id                  int64               `sql:",pk"`
     Name                string          
     Identifier          uuid.UUID           `sql:",type:uuid,unique,notnull"`
     Secret              string              `sql:",notnull" json:"-"`
