@@ -36,13 +36,13 @@ func CloseDb(Db *pg.DB) {
 
 func InitDb(Db *pg.DB) error {
     models := []interface{} {
-        (*ModelUserAccount)(nil),
-        (*ModelWorkspace)(nil),
+        (*ModelUser)(nil),
         (*ModelDevice)(nil),
         (*ModelDeviceSetting)(nil),
         (*ModelDeviceDataPointPh)(nil),
         (*ModelDeviceDataPointOxygen)(nil),
         (*ModelDeviceDataPointTemperature)(nil),
+        (*ModelUserDeviceAccess)(nil),
     }
 
     for _, model := range models {
