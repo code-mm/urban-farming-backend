@@ -30,4 +30,6 @@ func DeviceRouter(router *mux.Router) {
 func UserRouter(router *mux.Router) {
     userSubrouter := router.PathPrefix("/user").Subrouter()
     userSubrouter.Handle("/", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(User))).Methods("GET")
+    userSubrouter.Handle("/device", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserDeviceList))).Methods("GET")
+//    userSubrouter.Handle("/device/{id:[0-9]+}", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserDeviceRetrieve))).Methods("GET")
 }
