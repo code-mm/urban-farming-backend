@@ -10,7 +10,8 @@ import (
     "github.com/SermoDigital/jose/crypto"
 )
 
-func JwtTokenValidationDevice(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+
+func JwtTokenValidationFarm(rw http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	// Parse jwt from request header authorization field
 	token, err := jws.ParseJWTFromRequest(r)
 
@@ -19,14 +20,14 @@ func JwtTokenValidationDevice(rw http.ResponseWriter, r *http.Request, next http
         return
 	}
 
-	if err = token.Validate([]byte(JwtSecret), crypto.SigningMethodHS256); err != nil {
+	if err = token.Validate([]byte(jwtSettings.Secret), crypto.SigningMethodHS256); err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
         return
 	}
 
-	// get the deviceIdentifier from json jwt and store it in the request context
-	deviceIdentifier := token.Claims()["sub"]
-	context.Set(r, "deviceIdentifier", deviceIdentifier)
+	// get the farmIdentifier from json jwt and store it in the request context
+	farmIdentifier := token.Claims()["sub"]
+	context.Set(r, "farmIdentifier", farmIdentifier)
 
     next(rw, r)
 }
@@ -40,14 +41,14 @@ func JwtTokenValidationUser(rw http.ResponseWriter, r *http.Request, next http.H
         return
 	}
 
-	if err = token.Validate([]byte(JwtSecret), crypto.SigningMethodHS256); err != nil {
+	if err = token.Validate([]byte(jwtSettings.Secret), crypto.SigningMethodHS256); err != nil {
 		rw.WriteHeader(http.StatusUnauthorized)
         return
 	}
 
 	// get the email address from json jwt and store it in the request context
-	email := token.Claims()["sub"]
-	context.Set(r, "email", email)
+	userEmail := token.Claims()["sub"]
+	context.Set(r, "userEmail", userEmail)
 
     next(rw, r)
 }

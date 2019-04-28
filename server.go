@@ -1,36 +1,40 @@
 package main
 
 import (
-    "os"
     "log"
     "net/http"
-    "github.com/go-pg/pg"
+    "github.com/jinzhu/gorm"
+    _ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
-// database handle
-var Db *pg.DB
 
-// jwt secret
-var JwtSecret string
+// database settings
+var dbSettings *DatabaseSettings
+
+// jwt settings
+var jwtSettings *JwtSettings
+
+// database handle
+var db *gorm.DB
 
 func main() {
-    // read database related environment variables
-    connectionOptions := GetDbConnectionOptions(os.Getenv("DbHostname"), os.Getenv("DbPort"), os.Getenv("DbUsername"), os.Getenv("DbPassword"), os.Getenv("DbDatabase"))
+    // set database settings
+    dbSettings = DatabaseSettingsNew()
 
-    // read jwt secret related environment variable
-    JwtSecret = os.Getenv("JwtSecret")
+    //set jwt settings
+    jwtSettings = JwtSettingsNew()
 
-    // open database
-    Db = OpenDb(connectionOptions)
-    defer CloseDb(Db)
+    // initialize database
+    DbOpen(&db, dbSettings)
+    db.LogMode(true)
+    defer DbClose(db)
 
-    // create tables if they do not exist
-    InitDb(Db)
+    DbInit(db)
 
     // create router for api endpoints
     router := BaseRouter()
     AuthenticationRouter(router)
-    DeviceRouter(router)
+    FarmRouter(router)
     UserRouter(router)
 
     // start webserver loop

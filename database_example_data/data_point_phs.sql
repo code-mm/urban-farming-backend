@@ -1,0 +1,1 @@
+INSERT INTO data_point_phs (time, value, model_device_id) VALUES('2019-01-01 00:00:00-01', 5, 1);

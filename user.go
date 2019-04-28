@@ -5,20 +5,19 @@ import (
     "encoding/json"
     "github.com/gorilla/mux"
     "github.com/gorilla/context"
+    "./models"
 )
 
 
-/*
- * user
- */
 func User(w http.ResponseWriter, r *http.Request) {
-    var user ModelUser
-    if _, err := Db.QueryOne(&user, `SELECT * FROM "user" WHERE email = ?`, context.Get(r, "email").(string)); err != nil {
+    var userResult models.User
+
+    if db.Where("email = ?", context.Get(r, "userEmail").(string)).First(&userResult).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
 
-    result, err := json.Marshal(user)
+    result, err := json.Marshal(userResult)
     if err != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
@@ -28,18 +27,14 @@ func User(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-
-/*
- * user device list
- */
- func UserDeviceList(w http.ResponseWriter, r *http.Request) {
-    var device []ModelDevice
-    if _, err := Db.Query(&device, `select device.* from device INNER JOIN user_device_access ON device.id = user_device_access.model_device_id INNER JOIN "user" ON user_device_access.model_user_id = "user".id WHERE "user".email = ?`, context.Get(r, "email").(string)); err != nil {
+func UserFarmList(w http.ResponseWriter, r *http.Request) {
+    var farmResult []models.Farm
+    if db.Select("farms.*").Joins("INNER JOIN user_farm_permissions ON farms.id = user_farm_permissions.farm_id").Joins("INNER JOIN users ON user_farm_permissions.user_id = users.id").Where("email = ?", context.Get(r, "userEmail").(string)).Find(&farmResult).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
 
-    result, err := json.Marshal(device)
+    result, err := json.Marshal(farmResult)
     if err != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
@@ -49,40 +44,26 @@ func User(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
  }
 
-
-/*
- * user device datapoint
- */
-func UserDeviceDatapointPh(w http.ResponseWriter, r *http.Request) {
-    // check if device exists
+func UserFarmDatapointPh(w http.ResponseWriter, r *http.Request) {
+    // check if farm exists
     params := mux.Vars(r)
 
-    var device []ModelDevice
-    exists, err := Db.Model(&device).Where("id = ?", params["deviceId"]).Exists()
-    if err != nil {
-        w.WriteHeader(http.StatusInternalServerError)
-        return
-    }
-    if exists == false {
+    var farmResult models.Farm
+    if db.Where("id = ?", params["farmId"]).First(&farmResult).Error != nil {
         w.WriteHeader(http.StatusBadRequest)
         return
     }
 
-    // check if user has read access to device
-    var deviceAccess ModelUserDeviceAccess
-    exists, err = Db.Model(&deviceAccess).Join("JOIN \"user\" ON model_user_device_access.model_user_id = \"user\".id").Where("model_user_device_access.model_device_id=?", params["deviceId"]).Where("model_user_device_access.read=?", true).Where("\"user\".email=?", context.Get(r, "email").(string)).Exists()
-    if err != nil {
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-    if exists == false {
+    // check if user has read access to farm
+    var farmPermission models.UserFarmPermission
+    if db.Joins("JOIN users ON user_farm_permissions.user_id = users.id").Where("user_farm_permissions.farm_id=?", params["farmId"]).Where("user_farm_permissions.read=?", true).Where("users.email=?", context.Get(r, "userEmail").(string)).First(&farmPermission).Error != nil {
         w.WriteHeader(http.StatusBadRequest)
         return
     }
 
     // fetch data from database
-    var dataPoint []ModelDeviceDataPointPh
-    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_ph.time, device_datapoint_ph.value FROM device_datapoint_ph WHERE model_device_id = ?`, params["deviceId"]); err != nil {
+    var dataPoint []models.DataPointPh
+    if db.Select("data_point_phs.*").Where("farm_id = ?", params["farmId"]).Find(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
@@ -98,36 +79,26 @@ func UserDeviceDatapointPh(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-func UserDeviceDatapointOxygen(w http.ResponseWriter, r *http.Request) {
-    // check if device exists
+func UserFarmDatapointOxygen(w http.ResponseWriter, r *http.Request) {
+    // check if farm exists
     params := mux.Vars(r)
 
-    var device []ModelDevice
-    exists, err := Db.Model(&device).Where("id = ?", params["deviceId"]).Exists()
-    if err != nil {
-        w.WriteHeader(http.StatusInternalServerError)
-        return
-    }
-    if exists == false {
+    var farmResult models.Farm
+    if db.Where("id = ?", params["farmId"]).First(&farmResult).Error != nil {
         w.WriteHeader(http.StatusBadRequest)
         return
     }
 
-    // check if user has read access to device
-    var deviceAccess ModelUserDeviceAccess
-    exists, err = Db.Model(&deviceAccess).Join("JOIN \"user\" ON model_user_device_access.model_user_id = \"user\".id").Where("model_user_device_access.model_device_id=?", params["deviceId"]).Where("model_user_device_access.read=?", true).Where("\"user\".email=?", context.Get(r, "email").(string)).Exists()
-    if err != nil {
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-    if exists == false {
+    // check if user has read access to farm
+    var farmPermission models.UserFarmPermission
+    if db.Joins("JOIN users ON user_farm_permissions.user_id = users.id").Where("user_farm_permissions.farm_id=?", params["farmId"]).Where("user_farm_permissions.read=?", true).Where("users.email=?", context.Get(r, "userEmail").(string)).First(&farmPermission).Error != nil {
         w.WriteHeader(http.StatusBadRequest)
         return
     }
 
     // fetch data from database
-    var dataPoint []ModelDeviceDataPointPh
-    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_oxygen.time, device_datapoint_oxygen.value FROM device_datapoint_oxygen WHERE model_device_id = ?`, params["deviceId"]); err != nil {
+    var dataPoint []models.DataPointOxygen
+    if db.Select("data_point_oxygens.*").Where("farm_id = ?", params["farmId"]).Find(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
@@ -143,36 +114,26 @@ func UserDeviceDatapointOxygen(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-func UserDeviceDatapointTemperature(w http.ResponseWriter, r *http.Request) {
-    // check if device exists
+func UserFarmDatapointTemperature(w http.ResponseWriter, r *http.Request) {
+    // check if farm exists
     params := mux.Vars(r)
 
-    var device []ModelDevice
-    exists, err := Db.Model(&device).Where("id = ?", params["deviceId"]).Exists()
-    if err != nil {
-        w.WriteHeader(http.StatusInternalServerError)
-        return
-    }
-    if exists == false {
+    var farmResult models.Farm
+    if db.Where("id = ?", params["farmId"]).First(&farmResult).Error != nil {
         w.WriteHeader(http.StatusBadRequest)
         return
     }
 
-    // check if user has read access to device
-    var deviceAccess ModelUserDeviceAccess
-    exists, err = Db.Model(&deviceAccess).Join("JOIN \"user\" ON model_user_device_access.model_user_id = \"user\".id").Where("model_user_device_access.model_device_id=?", params["deviceId"]).Where("model_user_device_access.read=?", true).Where("\"user\".email=?", context.Get(r, "email").(string)).Exists()
-    if err != nil {
-        w.WriteHeader(http.StatusBadRequest)
-        return
-    }
-    if exists == false {
+    // check if user has read access to farm
+    var farmPermission models.UserFarmPermission
+    if db.Joins("JOIN users ON user_farm_permissions.user_id = users.id").Where("user_farm_permissions.farm_id=?", params["farmId"]).Where("user_farm_permissions.read=?", true).Where("users.email=?", context.Get(r, "userEmail").(string)).First(&farmPermission).Error != nil {
         w.WriteHeader(http.StatusBadRequest)
         return
     }
 
     // fetch data from database
-    var dataPoint []ModelDeviceDataPointPh
-    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_temperature.time, device_datapoint_temperature.value FROM device_datapoint_temperature WHERE model_device_id = ?`, params["deviceId"]); err != nil {
+    var dataPoint []models.DataPointTemperature
+    if db.Select("data_point_temperatures.*").Where("farm_id = ?", params["farmId"]).Find(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
