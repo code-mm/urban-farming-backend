@@ -5,20 +5,18 @@ import (
     "encoding/json"
     "github.com/gorilla/context"
     "gopkg.in/validator.v2"
+    "./models"
 )
 
 
-/*
- * device
- */
-func Device(w http.ResponseWriter, r *http.Request) {
-    var device ModelDevice
-    if _, err := Db.QueryOne(&device, `SELECT * FROM device WHERE identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+func Farm(w http.ResponseWriter, r *http.Request) {
+    var farmResult models.Farm
+    if db.Where("identifier = ?", context.Get(r, "farmIdentifier").(string)).First(&farmResult).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
 
-    result, err := json.Marshal(device)
+    result, err := json.Marshal(farmResult)
     if err != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
@@ -28,15 +26,11 @@ func Device(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-
-/*
- *  device datapoint ph
- */
-func DeviceDataPointPhList(w http.ResponseWriter, r *http.Request) {
-    var dataPoint []ModelDeviceDataPointPh
+func FarmDataPointPhList(w http.ResponseWriter, r *http.Request) {
+    var dataPoint []models.DataPointPh
 
     // query database for data points
-    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_ph.time, device_datapoint_ph.value FROM device_datapoint_ph INNER JOIN device ON device_datapoint_ph.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+    if db.Select("data_point_phs.id, data_point_phs.time, data_point_phs.value").Joins("INNER JOIN farms ON data_point_phs.farm_id = farms.id").Where("identifier = ?", context.Get(r, "farmIdentifier").(string)).Find(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
@@ -52,8 +46,8 @@ func DeviceDataPointPhList(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-func DeviceDataPointPhCreate(w http.ResponseWriter, r *http.Request) {
-    var dataPoint ModelDeviceDataPointPh
+func FarmDataPointPhCreate(w http.ResponseWriter, r *http.Request) {
+    var dataPoint models.DataPointPh
 
     // decode json from request
     if err := json.NewDecoder(r.Body).Decode(&dataPoint); err != nil {
@@ -68,14 +62,16 @@ func DeviceDataPointPhCreate(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // add device id to the model
-    if _, err := Db.QueryOne(&(dataPoint.ModelDeviceId), `SELECT device.id FROM device WHERE identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+    // add farm id to the model
+    var farm models.Farm
+    if db.Select("ID").Where("identifier = ?", context.Get(r, "farmIdentifier").(string)).First(&farm).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
+    dataPoint.FarmID = farm.ID
 
     // write model to database
-    if err := Db.Insert(&dataPoint); err != nil {
+    if db.Create(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
@@ -84,15 +80,11 @@ func DeviceDataPointPhCreate(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusCreated)
 }
 
-
-/*
- * device datapoint oxygen
- */
-func DeviceDataPointOxygenList(w http.ResponseWriter, r *http.Request) {
-    var dataPoint []ModelDeviceDataPointOxygen
+func FarmDataPointOxygenList(w http.ResponseWriter, r *http.Request) {
+    var dataPoint []models.DataPointOxygen
 
     // query database for data points
-    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_oxygen.time, device_datapoint_oxygen.value FROM device_datapoint_oxygen INNER JOIN device ON device_datapoint_oxygen.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+    if db.Select("data_point_oxygens.id, data_point_oxygens.time, data_point_oxygens.value").Joins("INNER JOIN farms ON data_point_oxygens.farm_id = farms.id").Where("identifier = ?", context.Get(r, "farmIdentifier").(string)).Find(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
@@ -108,8 +100,8 @@ func DeviceDataPointOxygenList(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-func DeviceDataPointOxygenCreate(w http.ResponseWriter, r *http.Request) {
-    var dataPoint ModelDeviceDataPointOxygen
+func FarmDataPointOxygenCreate(w http.ResponseWriter, r *http.Request) {
+    var dataPoint models.DataPointOxygen
 
     // decode json from request
     if err := json.NewDecoder(r.Body).Decode(&dataPoint); err != nil {
@@ -124,14 +116,16 @@ func DeviceDataPointOxygenCreate(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // add device id to the model
-    if _, err := Db.QueryOne(&(dataPoint.ModelDeviceId), `SELECT device.id FROM device WHERE identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+    // add farm id to the model
+    var farm models.Farm
+    if db.Select("ID").Where("identifier = ?", context.Get(r, "farmIdentifier").(string)).First(&farm).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
+    dataPoint.FarmID = farm.ID
 
     // write model to database
-    if err := Db.Insert(&dataPoint); err != nil {
+    if db.Create(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
@@ -140,15 +134,11 @@ func DeviceDataPointOxygenCreate(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusCreated)
 }
 
-
-/*
- * device datapoint temperature
- */
-func DeviceDataPointTemperatureList(w http.ResponseWriter, r *http.Request) {
-    var dataPoint []ModelDeviceDataPointTemperature
+func FarmDataPointTemperatureList(w http.ResponseWriter, r *http.Request) {
+    var dataPoint []models.DataPointTemperature
 
     // query database for data points
-    if _, err := Db.Query(&dataPoint, `SELECT device_datapoint_temperature.time, device_datapoint_temperature.value FROM device_datapoint_temperature INNER JOIN device ON device_datapoint_temperature.model_device_id = device.id WHERE device.identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+    if db.Select("data_point_temperatures.id, data_point_temperatures.time, data_point_temperatures.value").Joins("INNER JOIN farms ON data_point_temperatures.farm_id = farms.id").Where("identifier = ?", context.Get(r, "farmIdentifier").(string)).Find(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
@@ -164,8 +154,8 @@ func DeviceDataPointTemperatureList(w http.ResponseWriter, r *http.Request) {
     w.Write(result)
 }
 
-func DeviceDataPointTemperatureCreate(w http.ResponseWriter, r *http.Request) {
-    var dataPoint ModelDeviceDataPointTemperature
+func FarmDataPointTemperatureCreate(w http.ResponseWriter, r *http.Request) {
+    var dataPoint models.DataPointTemperature
 
     // decode json from request
     if err := json.NewDecoder(r.Body).Decode(&dataPoint); err != nil {
@@ -180,14 +170,16 @@ func DeviceDataPointTemperatureCreate(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // add device id to the model
-    if _, err := Db.QueryOne(&(dataPoint.ModelDeviceId), `SELECT device.id FROM device WHERE identifier = ?`, context.Get(r, "deviceIdentifier").(string)); err != nil {
+    // add farm id to the model
+    var farm models.Farm
+    if db.Select("ID").Where("identifier = ?", context.Get(r, "farmIdentifier").(string)).First(&farm).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }
+    dataPoint.FarmID = farm.ID
 
     // write model to database
-    if err := Db.Insert(&dataPoint); err != nil {
+    if db.Create(&dataPoint).Error != nil {
         w.WriteHeader(http.StatusInternalServerError)
         return
     }

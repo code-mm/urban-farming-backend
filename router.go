@@ -5,6 +5,7 @@ import (
 	"github.com/urfave/negroni"
 )
 
+
 func BaseRouter() *mux.Router {
 	router := mux.NewRouter()
 	return router
@@ -12,26 +13,26 @@ func BaseRouter() *mux.Router {
 
 func AuthenticationRouter(router *mux.Router) {
     authenticationSubrouter := router.PathPrefix("/authentication").Subrouter()
-    authenticationSubrouter.HandleFunc("/gettoken/device", AuthenticationGetTokenDevice).Methods("POST")
+    authenticationSubrouter.HandleFunc("/gettoken/farm", AuthenticationGetTokenFarm).Methods("POST")
     authenticationSubrouter.HandleFunc("/gettoken/user", AuthenticationGetTokenUser).Methods("POST")
 }
 
-func DeviceRouter(router *mux.Router) {
-	deviceSubrouter := router.PathPrefix("/device").Subrouter()
-    deviceSubrouter.Handle("/", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(Device))).Methods("GET")
-    deviceSubrouter.Handle("/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointPhList))).Methods("GET")
-    deviceSubrouter.Handle("/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.HandlerFunc(ContentTypeValidationJson), negroni.WrapFunc(DeviceDataPointPhCreate))).Methods("POST")
-    deviceSubrouter.Handle("/datapoint/oxygen", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointOxygenList))).Methods("GET")
-    deviceSubrouter.Handle("/datapoint/oxygen", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.HandlerFunc(ContentTypeValidationJson), negroni.WrapFunc(DeviceDataPointOxygenCreate))).Methods("POST")
-    deviceSubrouter.Handle("/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.WrapFunc(DeviceDataPointTemperatureList))).Methods("GET")
-    deviceSubrouter.Handle("/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationDevice), negroni.HandlerFunc(ContentTypeValidationJson), negroni.WrapFunc(DeviceDataPointTemperatureCreate))).Methods("POST")
+func FarmRouter(router *mux.Router) {
+	deviceSubrouter := router.PathPrefix("/farm").Subrouter()
+    deviceSubrouter.Handle("/", negroni.New(negroni.HandlerFunc(JwtTokenValidationFarm), negroni.WrapFunc(Farm))).Methods("GET")
+    deviceSubrouter.Handle("/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationFarm), negroni.WrapFunc(FarmDataPointPhList))).Methods("GET")
+    deviceSubrouter.Handle("/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationFarm), negroni.HandlerFunc(ContentTypeValidationJson), negroni.WrapFunc(FarmDataPointPhCreate))).Methods("POST")
+    deviceSubrouter.Handle("/datapoint/oxygen", negroni.New(negroni.HandlerFunc(JwtTokenValidationFarm), negroni.WrapFunc(FarmDataPointOxygenList))).Methods("GET")
+    deviceSubrouter.Handle("/datapoint/oxygen", negroni.New(negroni.HandlerFunc(JwtTokenValidationFarm), negroni.HandlerFunc(ContentTypeValidationJson), negroni.WrapFunc(FarmDataPointOxygenCreate))).Methods("POST")
+    deviceSubrouter.Handle("/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationFarm), negroni.WrapFunc(FarmDataPointTemperatureList))).Methods("GET")
+    deviceSubrouter.Handle("/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationFarm), negroni.HandlerFunc(ContentTypeValidationJson), negroni.WrapFunc(FarmDataPointTemperatureCreate))).Methods("POST")
 }
 
 func UserRouter(router *mux.Router) {
     userSubrouter := router.PathPrefix("/user").Subrouter()
     userSubrouter.Handle("/", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(User))).Methods("GET")
-    userSubrouter.Handle("/device", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserDeviceList))).Methods("GET")
-    userSubrouter.Handle("/device/{deviceId:[0-9]+}/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserDeviceDatapointPh))).Methods("GET")
-    userSubrouter.Handle("/device/{deviceId:[0-9]+}/datapoint/oxygen", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserDeviceDatapointOxygen))).Methods("GET")
-    userSubrouter.Handle("/device/{deviceId:[0-9]+}/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserDeviceDatapointTemperature))).Methods("GET")
+    userSubrouter.Handle("/farm", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserFarmList))).Methods("GET")
+    userSubrouter.Handle("/farm/{farmId:[0-9]+}/datapoint/ph", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserFarmDatapointPh))).Methods("GET")
+    userSubrouter.Handle("/farm/{farmId:[0-9]+}/datapoint/oxygen", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserFarmDatapointOxygen))).Methods("GET")
+    userSubrouter.Handle("/farm/{farmId:[0-9]+}/datapoint/temperature", negroni.New(negroni.HandlerFunc(JwtTokenValidationUser), negroni.WrapFunc(UserFarmDatapointTemperature))).Methods("GET")
 }
