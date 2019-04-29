@@ -1,0 +1,8 @@
+# docker build -t urban-farming-backend -f Dockerfile.scratch .
+
+FROM scratch
+
+ADD server /
+
+EXPOSE 8080
+CMD ["./server"]
