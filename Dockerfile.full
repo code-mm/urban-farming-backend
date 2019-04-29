@@ -10,5 +10,5 @@ RUN go get -d github.com/SermoDigital/jose/crypto github.com/SermoDigital/jose/j
 
 RUN go build -o urban-farming-backend server.go helpers.go router.go middleware.go farm.go user.go authentication.go
 
-EXPOSE 8080
+EXPOSE 8000
 CMD ["./urban-farming-backend"]
