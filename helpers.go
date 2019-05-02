@@ -4,7 +4,8 @@ import (
     "os"
     "log"
     "strconv"
-    "strings"
+    "fmt"
+    "crypto/rand"
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/postgres"
     "./models"
@@ -56,7 +57,7 @@ func (setting *DatabaseSettings) parseDatabasePassword() {
     if set {
         setting.Password = password
     } else {
-        setting.Password = "postgres" // default postgres password
+        setting.Password = "urban_farming" // default application password
     } 
 }
 
@@ -69,23 +70,15 @@ func (setting *DatabaseSettings) parseDatabaseDatabaseName() {
     }
 }
 
-func (setting *DatabaseSettings) GetDatabaseArguments() string {
-    var arguments strings.Builder
-    arguments.WriteString("host=")
-    arguments.WriteString(setting.Hostname)
-    arguments.WriteString(" ")
-    arguments.WriteString("port=")
-    arguments.WriteString(strconv.Itoa(setting.Port))
-    arguments.WriteString(" ")
-    arguments.WriteString("user=")
-    arguments.WriteString(setting.Username)
-    arguments.WriteString(" ")
-    arguments.WriteString("password=")
-    arguments.WriteString(setting.Password)
-    arguments.WriteString(" ")
-    arguments.WriteString("dbname=")
-    arguments.WriteString(setting.DatabaseName)
-    return arguments.String()
+func (setting *DatabaseSettings) GetDatabaseDSN() string {
+    dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s",
+        setting.Hostname,
+        strconv.Itoa(setting.Port),
+        setting.Username,
+        setting.Password,
+        setting.DatabaseName
+    )
+    return dsn
 }
 
 func DatabaseSettingsNew() *DatabaseSettings {
@@ -108,9 +101,19 @@ type JwtSettings struct {
 func (setting *JwtSettings) parseJwtSecret() {
     secret, set := os.LookupEnv("JwtSecret")
     if set {
+        // check for a minimum of 32 byte secret
+        if len(secret) < 32 {
+            log.Fatal("Invalid value for JwtSecret: 32 characters are required")
+        }
         setting.Secret = secret
     } else {
-        setting.Secret = "secret"
+        // generate random secret
+        secret := make([]byte, 32)
+        _, err := rand.Read(secret)
+        if err != nil {
+            log.Fatal(err)
+        }
+        setting.Secret = string(secret)
     }
 }
 
@@ -120,7 +123,7 @@ func (setting *JwtSettings) parseJwtValidityFarm() {
     if set {
         setting.ValidityFarm, err = strconv.Atoi(validity)
         if err != nil {
-            log.Fatal(err)
+            log.Fatal("Invalid value for JwtValidityFarm")
         }
     } else {
         setting.ValidityFarm = 3600
@@ -133,7 +136,7 @@ func (setting *JwtSettings) parseJwtValidityUser() {
     if set {
         setting.ValidityUser, err = strconv.Atoi(validity)
         if err != nil {
-            log.Fatal(err)
+            log.Fatal("Invalid value for JwtValidityUser")
         }
     } else {
         setting.ValidityUser = 3600
@@ -151,7 +154,7 @@ func JwtSettingsNew() *JwtSettings {
 // database connection operations
 func DbOpen(db **gorm.DB, settings *DatabaseSettings) {
     var err error
-    *db, err = gorm.Open("postgres", settings.GetDatabaseArguments())
+    *db, err = gorm.Open("postgres", settings.GetDatabaseDSN())
     if err != nil {
         log.Fatal(err)
     }
