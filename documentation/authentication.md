@@ -1,13 +1,13 @@
-# Authentication of devices against the device endpoint
+# Authentication of farms against the farm endpoint
 
 ## Request of JSON web token
-The device requires a valid device identifier and device secret to successfully receive a JSON web token.
+The farm requires a valid farm identifier and farm secret to successfully receive a JSON web token.
 The identifier consists of an UUID and the secret is an alphanumeric string, special characters are permitted.
-To start the authentication, the device has to send its identifier and secret to the "/authentication/gettoken/device" endpoint.
+To start the authentication, the farm has to send its identifier and secret to the "/authentication/gettoken/farm" endpoint.
 The endpoint requires the HTTP method POST and the content type "application/x-www-form-urlencoded". The required form fields
-are called deviceIdentifier and deviceSecret. A possible request could look like "deviceIdentifier=<identifier>&deviceSecret=<secret>",
+are called identifier and secret. A possible request could look like "identifier=<identifier>&secret=<secret>",
 while the <identifier> and <secret> is replaced with its respective values.
-If the authentication was succesful the endpoint responds with HTTP status code 200 and the content type "application/jwt",
+If the authentication was successful the endpoint responds with HTTP status code 200 and the content type "application/jwt",
 otherwise a HTTP status code 401 is send.
 
 ## Authentication against the device endpoint
@@ -15,4 +15,24 @@ After a successful acquisition of a JSON web token, it must be send with each su
 Therefore, the HTTP header "Authorization" must be added and the value must be of form "Bearer <JSON web token>",
 while <JSON web token> is replaced with the actual token.
 
-The validity of a token is restricted to one hour. After this period a new token must be acquired.
+The default validity of a token is restricted to 60 seconds . After this period a new token must be acquired.
+
+
+# Authentication of users against the user endpoint
+
+## Request of JSON web token
+The user requires a valid email and password to successfully receive a JSON web token.
+The email consists of a valid formatted email address and the password is an alphanumeric string, special characters are permitted.
+To start the authentication, the user has to send its email and password to the "/authentication/gettoken/user" endpoint.
+The endpoint requires the HTTP method POST and the content type "application/x-www-form-urlencoded". The required form fields
+are called email and password. A possible request could look like "email=<email-address>&password=<password>",
+while the <email-address> and <password> is replaced with its respective values.
+If the authentication was successful the endpoint responds with HTTP status code 200 and the content type "application/jwt",
+otherwise a HTTP status code 401 is send.
+
+## Authentication against the user endpoint
+After a successful acquisition of a JSON web token, it must be send with each subsequent request.
+Therefore, the HTTP header "Authorization" must be added and the value must be of form "Bearer <JSON web token>",
+while <JSON web token> is replaced with the actual token.
+
+The default validity of a token is restricted to 30 seconds . After this period a new token must be acquired.
