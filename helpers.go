@@ -126,7 +126,7 @@ func (setting *JwtSettings) parseJwtValidityFarm() {
             log.Fatal("Invalid value for JwtValidityFarm")
         }
     } else {
-        setting.ValidityFarm = 3600
+        setting.ValidityFarm = 60
     }
 }
 
@@ -139,7 +139,7 @@ func (setting *JwtSettings) parseJwtValidityUser() {
             log.Fatal("Invalid value for JwtValidityUser")
         }
     } else {
-        setting.ValidityUser = 3600
+        setting.ValidityUser = 30
     }
 }
 
